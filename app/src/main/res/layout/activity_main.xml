@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/fixtok_background">
+
+    <!-- The WebView is added here at runtime. -->
+    <FrameLayout
+        android:id="@+id/webContainer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <FrameLayout
+        android:id="@+id/fullscreenContainer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#000000"
+        android:visibility="gone" />
+
+    <ProgressBar
+        android:id="@+id/loading"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="32dp"
+        android:visibility="gone" />
+
+    <!-- Virtual pointer, moved by translation in VirtualPointer -->
+    <View
+        android:id="@+id/pointer"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:background="@drawable/pointer_dot"
+        android:visibility="gone" />
+
+    <LinearLayout
+        android:id="@+id/splash"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/fixtok_background"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/app_name"
+            android:textColor="@color/fixtok_text"
+            android:textSize="48sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/splash_subtitle"
+            android:textColor="@color/fixtok_text_dim"
+            android:textSize="18sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/errorCard"
+        android:layout_width="560dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:background="@color/fixtok_surface_elevated"
+        android:orientation="vertical"
+        android:padding="32dp"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/errorText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/fixtok_text"
+            android:textSize="20sp" />
+
+        <Button
+            android:id="@+id/retryButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:layout_marginTop="24dp"
+            android:text="@string/action_retry" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/menuPanel"
+        android:layout_width="360dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="end"
+        android:background="@color/fixtok_surface"
+        android:orientation="vertical"
+        android:padding="24dp"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/menuStatus"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:textColor="@color/fixtok_text_dim"
+            android:textSize="16sp" />
+
+        <Button
+            android:id="@+id/menuHome"
+            style="@style/FixTok.MenuButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/menu_home" />
+
+        <Button
+            android:id="@+id/menuRefresh"
+            style="@style/FixTok.MenuButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/menu_refresh" />
+
+        <Button
+            android:id="@+id/menuBack"
+            style="@style/FixTok.MenuButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/menu_back" />
+
+        <Button
+            android:id="@+id/menuForward"
+            style="@style/FixTok.MenuButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/menu_forward" />
+
+        <Button
+            android:id="@+id/menuPointer"
+            style="@style/FixTok.MenuButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/menu_pointer_on" />
+
+        <Button
+            android:id="@+id/menuPlayPause"
+            style="@style/FixTok.MenuButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/menu_play_pause" />
+
+        <Button
+            android:id="@+id/menuSignIn"
+            style="@style/FixTok.MenuButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/menu_sign_in" />
+
+        <Button
+            android:id="@+id/menuSignOut"
+            style="@style/FixTok.MenuButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/menu_sign_out" />
+
+        <Button
+            android:id="@+id/menuClose"
+            style="@style/FixTok.MenuButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/menu_close" />
+    </LinearLayout>
+</FrameLayout>
