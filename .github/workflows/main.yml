@@ -1,0 +1,116 @@
+name: Build AO3TV
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - ".github/workflows/build-ao3tv.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout fork
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Rename app and replace website
+        shell: bash
+        run: |
+          python3 <<'PY'
+          from pathlib import Path
+
+          root = Path(".")
+          strings = root / "app/src/main/res/values/strings.xml"
+
+          if not strings.exists():
+              raise SystemExit(
+                  "Could not find app/src/main/res/values/strings.xml"
+              )
+
+          text = strings.read_text(encoding="utf-8")
+
+          # Change the launcher name and visible app branding.
+          text = text.replace(
+              '<string name="app_name">FixTok</string>',
+              '<string name="app_name">AO3TV</string>'
+          )
+          text = text.replace("FixTok 7 · by Manas", "AO3TV · TV Edition")
+          text = text.replace("FixTok", "AO3TV")
+          text = text.replace("TikTok", "AO3")
+          strings.write_text(text, encoding="utf-8")
+
+          # Change website URLs and host-policy references without
+          # renaming Kotlin classes or changing the application ID.
+          extensions = {
+              ".kt", ".java", ".xml", ".json",
+              ".properties", ".kts"
+          }
+          replacements = {
+              "https://www.tiktok.com": "https://archiveofourown.org",
+              "https://tiktok.com": "https://archiveofourown.org",
+              "http://www.tiktok.com": "https://archiveofourown.org",
+              "http://tiktok.com": "https://archiveofourown.org",
+              "www.tiktok.com": "archiveofourown.org",
+              "tiktok.com": "archiveofourown.org",
+          }
+
+          changed = []
+          for folder in ("app/src",):
+              base = root / folder
+              if not base.exists():
+                  continue
+
+              for path in base.rglob("*"):
+                  if not path.is_file() or path.suffix not in extensions:
+                      continue
+                  try:
+                      original = path.read_text(encoding="utf-8")
+                  except UnicodeDecodeError:
+                      continue
+
+                  updated = original
+                  for old, new in replacements.items():
+                      updated = updated.replace(old, new)
+
+                  if updated != original:
+                      path.write_text(updated, encoding="utf-8")
+                      changed.append(str(path))
+
+          print("Updated app branding and website.")
+          print("Changed source files:", changed)
+          PY
+
+      - name: Commit source changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email \
+            "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add app/src
+          git diff --cached --quiet || \
+            git commit -m "Rebrand app as AO3TV"
+          git push
+
+      - name: Build AO3TV APK
+        run: |
+          chmod +x ./gradlew
+          ./gradlew --no-daemon assembleDebug
+
+      - name: Upload AO3TV APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: AO3TV-Android-TV
+          path: app/build/outputs/apk/debug/*.apk
+          if-no-files-found: error
