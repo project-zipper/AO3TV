@@ -1,23 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">FixTok</string>
+    <string name="app_name">AO3TV</string>
     <string name="by_manas">by Manas</string>
-    <string name="splash_subtitle">FixTok 7 · by Manas</string>
+    <string name="splash_subtitle">AO3TV · TV Edition</string>
 
     <string name="error_unknown">unknown error</string>
-    <string name="error_retrying">Could not load TikTok (%1$s). Retrying in %2$d s…</string>
-    <string name="error_final">Could not load TikTok (%1$s). Check the connection, then press Retry.</string>
-    <string name="error_http">TikTok returned HTTP %d. Try again later.</string>
-    <string name="error_ssl">The secure connection to TikTok could not be verified, so the page was stopped.</string>
+    <string name="error_retrying">Could not load AO3 (%1$s). Retrying in %2$d s…</string>
+    <string name="error_final">Could not load AO3 (%1$s). Check the connection, then press Retry.</string>
+    <string name="error_http">AO3 returned HTTP %d. Try again later.</string>
+    <string name="error_ssl">The secure connection to AO3 could not be verified, so the page was stopped.</string>
     <string name="action_retry">Retry</string>
 
-    <string name="menu_home">TikTok home</string>
+    <string name="menu_home">AO3 home</string>
     <string name="menu_refresh">Refresh</string>
     <string name="menu_back">Back</string>
     <string name="menu_forward">Forward</string>
     <string name="menu_pointer_on">Turn on pointer</string>
     <string name="menu_pointer_off">Turn off pointer</string>
-    <string name="menu_sign_in">Sign in on TikTok</string>
+    <string name="menu_sign_in">Sign in on AO3</string>
     <string name="menu_sign_out">Sign out and clear data</string>
     <string name="menu_play_pause">Play / pause video</string>
     <string name="menu_close">Close</string>
@@ -25,15 +25,15 @@
     <string name="status_signed_out">Not signed in</string>
 
     <string name="confirm_clear_title">Sign out?</string>
-    <string name="confirm_clear_message">This removes all TikTok cookies and stored data from this app, including the sign-in.</string>
+    <string name="confirm_clear_message">This removes all AO3 cookies and stored data from this app, including the sign-in.</string>
     <string name="action_clear">Sign out</string>
     <string name="action_cancel">Cancel</string>
 
     <string name="toast_cleared">Signed out. Data cleared.</string>
     <string name="toast_no_forward">No page to go forward to</string>
     <string name="toast_no_back">No page to go back to</string>
-    <string name="toast_sign_in_opened">Opening TikTok sign-in. Enter your details on TikTok itself.</string>
-    <string name="toast_session_expired">TikTok asks you to sign in again. Use the menu to sign in.</string>
+    <string name="toast_sign_in_opened">Opening AO3 sign-in. Enter your details on AO3 itself.</string>
+    <string name="toast_session_expired">AO3 asks you to sign in again. Use the menu to sign in.</string>
     <string name="toast_render_crash">The page engine stopped. Reloading the page.</string>
     <string name="toast_no_browser">No app can open this link</string>
     <string name="toast_back_again">Press Back again to exit</string>

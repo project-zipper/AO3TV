@@ -9,16 +9,16 @@ class PolicyTest {
 
     @Test
     fun tiktokAndSubdomainsAreInApp() {
-        assertTrue(Policy.isInAppHost("www.tiktok.com"))
-        assertTrue(Policy.isInAppHost("tiktok.com"))
+        assertTrue(Policy.isInAppHost("archiveofourown.org"))
+        assertTrue(Policy.isInAppHost("archiveofourown.org"))
         assertTrue(Policy.isInAppHost("WWW.TikTok.com."))
     }
 
     @Test
     fun lookalikeHostsAreRejected() {
-        assertFalse(Policy.isInAppHost("eviltiktok.com"))
-        assertFalse(Policy.isInAppHost("tiktok.com.evil.example"))
-        assertFalse(Policy.isInAppHost("example.com/tiktok.com"))
+        assertFalse(Policy.isInAppHost("evilarchiveofourown.org"))
+        assertFalse(Policy.isInAppHost("archiveofourown.org.evil.example"))
+        assertFalse(Policy.isInAppHost("example.com/archiveofourown.org"))
         assertFalse(Policy.isInAppHost(null))
         assertFalse(Policy.isInAppHost(""))
     }
