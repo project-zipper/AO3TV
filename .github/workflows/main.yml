@@ -1,10 +1,8 @@
-name: Build AO3TV
+
+name: Repair and Build AO3TV
 
 on:
   workflow_dispatch:
-  push:
-    paths:
-      - ".github/workflows/build-ao3tv.yml"
 
 permissions:
   contents: write
@@ -14,83 +12,98 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout fork
+      - name: Checkout repository
         uses: actions/checkout@v4
         with:
           persist-credentials: true
 
-      - name: Set up Java
+      - name: Set up Java 17
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: "17"
 
-      - name: Rename app and replace website
+      - name: Rename package and repair AO3 configuration
         shell: bash
         run: |
           python3 <<'PY'
           from pathlib import Path
 
           root = Path(".")
-          strings = root / "app/src/main/res/values/strings.xml"
+          gradle = root / "app/build.gradle.kts"
 
-          if not strings.exists():
-              raise SystemExit(
-                  "Could not find app/src/main/res/values/strings.xml"
-              )
+          if not gradle.exists():
+              raise SystemExit("Missing app/build.gradle.kts")
 
-          text = strings.read_text(encoding="utf-8")
-
-          # Change the launcher name and visible app branding.
+          text = gradle.read_text(encoding="utf-8")
           text = text.replace(
-              '<string name="app_name">FixTok</string>',
-              '<string name="app_name">AO3TV</string>'
+              'namespace = "com.fixtok.tv"',
+              'namespace = "org.wolfie.ao3tv"'
           )
-          text = text.replace("FixTok 7 · by Manas", "AO3TV · TV Edition")
-          text = text.replace("FixTok", "AO3TV")
-          text = text.replace("TikTok", "AO3")
-          strings.write_text(text, encoding="utf-8")
+          text = text.replace(
+              'applicationId = "com.fixtok.tv"',
+              'applicationId = "org.wolfie.ao3tv"'
+          )
+          gradle.write_text(text, encoding="utf-8")
 
-          # Change website URLs and host-policy references without
-          # renaming Kotlin classes or changing the application ID.
           extensions = {
               ".kt", ".java", ".xml", ".json",
               ".properties", ".kts"
           }
-          replacements = {
-              "https://www.tiktok.com": "https://archiveofourown.org",
-              "https://tiktok.com": "https://archiveofourown.org",
-              "http://www.tiktok.com": "https://archiveofourown.org",
-              "http://tiktok.com": "https://archiveofourown.org",
-              "www.tiktok.com": "archiveofourown.org",
-              "tiktok.com": "archiveofourown.org",
-          }
 
-          changed = []
-          for folder in ("app/src",):
-              base = root / folder
+          replacements = [
+              ("https://www.tiktok.com", "https://archiveofourown.org"),
+              ("http://www.tiktok.com", "https://archiveofourown.org"),
+              ("https://m.tiktok.com", "https://archiveofourown.org"),
+              ("http://m.tiktok.com", "https://archiveofourown.org"),
+              ("https://tiktok.com", "https://archiveofourown.org"),
+              ("http://tiktok.com", "https://archiveofourown.org"),
+              ("www.tiktok.com", "archiveofourown.org"),
+              ("m.tiktok.com", "archiveofourown.org"),
+              ("tiktok.com", "archiveofourown.org"),
+              ("com.fixtok.tv", "org.wolfie.ao3tv"),
+          ]
+
+          for base in (root / "app/src",):
               if not base.exists():
-                  continue
+                  raise SystemExit(f"Missing source directory: {base}")
 
               for path in base.rglob("*"):
                   if not path.is_file() or path.suffix not in extensions:
                       continue
+
                   try:
                       original = path.read_text(encoding="utf-8")
                   except UnicodeDecodeError:
                       continue
 
                   updated = original
-                  for old, new in replacements.items():
+                  for old, new in replacements:
                       updated = updated.replace(old, new)
+
+                  # Update user-visible labels without renaming
+                  # Kotlin classes or internal method names.
+                  if path.name == "strings.xml":
+                      updated = updated.replace("FixTok 7", "AO3TV")
+                      updated = updated.replace("FixTok", "AO3TV")
+                      updated = updated.replace("TikTok", "AO3")
 
                   if updated != original:
                       path.write_text(updated, encoding="utf-8")
-                      changed.append(str(path))
+                      print(f"Updated: {path}")
 
-          print("Updated app branding and website.")
-          print("Changed source files:", changed)
+          print("Package: org.wolfie.ao3tv")
+          print("Website: https://archiveofourown.org/")
           PY
+
+      - name: Verify package configuration
+        run: |
+          grep -q 'namespace = "org.wolfie.ao3tv"' \
+            app/build.gradle.kts
+          grep -q 'applicationId = "org.wolfie.ao3tv"' \
+            app/build.gradle.kts
+          grep -q 'name="app_name">AO3TV</string>' \
+            app/src/main/res/values/strings.xml
 
       - name: Commit source changes
         run: |
@@ -98,19 +111,27 @@ jobs:
           git config user.email \
             "41898282+github-actions[bot]@users.noreply.github.com"
 
-          git add app/src
-          git diff --cached --quiet || \
-            git commit -m "Rebrand app as AO3TV"
-          git push
+          git add app
+          if ! git diff --cached --quiet; then
+            git commit -m "Repair and rebrand AO3TV"
+            git push
+          fi
 
-      - name: Build AO3TV APK
+      - name: Run unit tests and build APK
+        shell: bash
         run: |
           chmod +x ./gradlew
-          ./gradlew --no-daemon assembleDebug
+          set -o pipefail
+          ./gradlew --no-daemon \
+            testDebugUnitTest assembleDebug \
+            --stacktrace 2>&1 | tee build.log
 
-      - name: Upload AO3TV APK
+      - name: Upload APK and build diagnostics
+        if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: AO3TV-Android-TV
-          path: app/build/outputs/apk/debug/*.apk
-          if-no-files-found: error
+          name: AO3TV-build-results
+          path: |
+            app/build/outputs/apk/debug/*.apk
+            build.log
+          if-no-files-found: warn
